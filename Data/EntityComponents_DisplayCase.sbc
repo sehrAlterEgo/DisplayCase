@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <EntityComponents>
+    <EntityComponent xsi:type="MyObjectBuilder_InventoryComponentDefinition">
+      <Id>
+        <TypeId>Inventory</TypeId>
+        <SubtypeId>DisplayCase1</SubtypeId>
+      </Id>
+	    <Volume>1</Volume>
+        <Size x="1" y="1" z="1" />
+        <InputConstraint Whitelist="true" Description="DisplayName_InventoryConstraint_PersonalItems" Icon="Textures\GUI\Icons\FilterComponent.dds">
+            <Entry Type="PhysicalGunObject" />
+            <Entry Type="AmmoMagazine" />
+			<Entry Type="Component" />
+			<Entry Type="Ingot" />
+			<Entry Type="ConsumableItem" />
+			<Entry Type="Datapad" />
+			<Entry Type="Package" />
+			<Entry Type="PhysicalObject" />
+      </InputConstraint>
+    </EntityComponent>
+  </EntityComponents>
+</Definitions>
