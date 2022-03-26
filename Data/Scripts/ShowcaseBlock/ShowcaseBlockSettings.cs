@@ -6,9 +6,12 @@ namespace ShowcaseBlock
     public class ShowcaseBlockSettings
     {
         [ProtoMember(1)]
-        public ushort rotationY;
-    
-        [ProtoMember(2)]
         public ushort rotationX;
+
+        [ProtoMember(2)]
+        public ushort rotationY;
+
+        [ProtoMember(3)]
+        public ushort rotationZ;
     }
 }

@@ -19,64 +19,95 @@ namespace ShowcaseBlock
 
             mod.ControlsCreated = true;
 
-            IMyTerminalControlSlider tmp_control = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyLightingBlock>("rotationY");
-            tmp_control.Title = MyStringId.GetOrCompute("Y Axis Rotation");
+            IMyTerminalControlSlider tmp_control = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyLightingBlock>("rotationX");
+            tmp_control.Title = MyStringId.GetOrCompute("Pitch");
+            tmp_control.Enabled = Control_Visible;
+            tmp_control.Visible = Control_Visible; // (_) => false;
+            tmp_control.SetLimits(-180, 180);
+            tmp_control.Getter = rotationXGetter;
+            tmp_control.Setter = rotationXSetter;
+            tmp_control.Writer = rotationXWriter;
+            tmp_control.SupportsMultipleBlocks = true;
+
+            MyAPIGateway.TerminalControls.AddControl<IMyLightingBlock>(tmp_control);
+            tmp_control = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyLightingBlock>("rotationY");
+            tmp_control.Title = MyStringId.GetOrCompute("Yaw");
             tmp_control.Enabled = Control_Visible;
             tmp_control.Visible = Control_Visible;
+            tmp_control.SetLimits(-180, 180);
             tmp_control.Getter = rotationYGetter;
             tmp_control.Setter = rotationYSetter;
             tmp_control.Writer = rotationYWriter;
             tmp_control.SupportsMultipleBlocks = true;
             MyAPIGateway.TerminalControls.AddControl<IMyLightingBlock>(tmp_control);
 
-            tmp_control = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyLightingBlock>("rotationX");
-            tmp_control.Title = MyStringId.GetOrCompute("X Axis Rotation");
+            tmp_control = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyLightingBlock>("rotationZ");
+            tmp_control.Title = MyStringId.GetOrCompute("Roll");
             tmp_control.Enabled = Control_Visible;
-            tmp_control.Visible = (_) => false;
-            tmp_control.Getter = rotationXGetter;
-            tmp_control.Setter = rotationXSetter;
-            tmp_control.Writer = rotationXWriter;
+            tmp_control.Visible = Control_Visible;
+            tmp_control.SetLimits(-180, 180);
+            tmp_control.Getter = rotationZGetter;
+            tmp_control.Setter = rotationZSetter;
+            tmp_control.Writer = rotationZWriter;
             tmp_control.SupportsMultipleBlocks = true;
             MyAPIGateway.TerminalControls.AddControl<IMyLightingBlock>(tmp_control);
         }
         static ShowcaseContainer GetLogic(IMyTerminalBlock block) => block?.GameLogic?.GetAs<ShowcaseContainer>();
         static bool Control_Visible(IMyTerminalBlock block)
         { return GetLogic(block) != null; }
-        private static float rotationYGetter(IMyTerminalBlock block) 
-        { 
-            var logic = GetLogic(block);
-            return (logic == null ? 0.5f : logic.rotationY / 360f); 
-        }
-        private static void rotationYSetter(IMyTerminalBlock block, float value)
-        { 
-            var logic = GetLogic(block);
-            if(logic != null)
-                logic.rotationY.Value = (ushort)(value * 360);
-                logic.Rotate();
-        }
-        private static void rotationYWriter(IMyTerminalBlock block, StringBuilder writer)
-        { 
-            var logic = GetLogic(block);
-            if(logic != null)
-                writer.Append(logic.rotationY);
-        }
         private static float rotationXGetter(IMyTerminalBlock block) 
         {
              var logic = GetLogic(block);
-            return (logic == null ? 0.5f : logic.rotationX / 360f); 
+            return (logic == null ? 0 : logic.rotationX - 180); 
         }
         private static void rotationXSetter(IMyTerminalBlock block, float value)
         { 
             var logic = GetLogic(block);
             if(logic != null)
-                logic.rotationX.Value = (ushort)(value * 360);
+                logic.rotationX.Value = (ushort)(value + 180);
                 logic.Rotate();
         }
         private static void rotationXWriter(IMyTerminalBlock block, StringBuilder writer)
         { 
             var logic = GetLogic(block);
             if(logic != null)
-                writer.Append((int)(logic.rotationX));
+                writer.Append((int)(logic.rotationX - 180));
+        }
+        private static float rotationYGetter(IMyTerminalBlock block) 
+        { 
+            var logic = GetLogic(block);
+            return (logic == null ? 0 : logic.rotationY - 180); 
+        }
+        private static void rotationYSetter(IMyTerminalBlock block, float value)
+        { 
+            var logic = GetLogic(block);
+            if(logic != null)
+                logic.rotationY.Value = (ushort)(value + 180);
+                logic.Rotate();
+        }
+        private static void rotationYWriter(IMyTerminalBlock block, StringBuilder writer)
+        { 
+            var logic = GetLogic(block);
+            if(logic != null)
+                writer.Append(logic.rotationY - 180);
+        }
+        private static float rotationZGetter(IMyTerminalBlock block) 
+        { 
+            var logic = GetLogic(block);
+            return (logic == null ? 0 : logic.rotationZ - 180); 
+        }
+        private static void rotationZSetter(IMyTerminalBlock block, float value)
+        { 
+            var logic = GetLogic(block);
+            if(logic != null)
+                logic.rotationZ.Value = (ushort)(value + 180);
+                logic.Rotate();
+        }
+        private static void rotationZWriter(IMyTerminalBlock block, StringBuilder writer)
+        { 
+            var logic = GetLogic(block);
+            if(logic != null)
+                writer.Append(logic.rotationZ - 180);
         }
         #endregion
 
@@ -99,6 +130,7 @@ namespace ShowcaseBlock
                 {
                     rotationX.Value = loadedSettings.rotationX;
                     rotationY.Value = loadedSettings.rotationY;
+                    rotationZ.Value = loadedSettings.rotationZ;
                     return true;
                 }
             }
@@ -153,6 +185,10 @@ namespace ShowcaseBlock
                             if(ushort.TryParse(data[1], out f))
                                 rotationY.Value = f;
                             break;
+                        case "rotationZ":
+                            if(ushort.TryParse(data[1], out f))
+                                rotationZ.Value = f;
+                            break;
                     }
                 }
             }
@@ -177,6 +213,7 @@ namespace ShowcaseBlock
 
             Settings.rotationX = rotationX;
             Settings.rotationY = rotationY;
+            Settings.rotationZ = rotationZ;
             block.Storage.SetValue(SETTINGS_GUID, Convert.ToBase64String(MyAPIGateway.Utilities.SerializeToBinary(Settings)));
         }
         public override bool IsSerialized()

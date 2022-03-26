@@ -37,6 +37,7 @@ namespace ShowcaseBlock
 
         MySync<UInt16, VRage.Sync.SyncDirection.BothWays> rotationX;
         MySync<UInt16, VRage.Sync.SyncDirection.BothWays> rotationY;
+        MySync<UInt16, VRage.Sync.SyncDirection.BothWays> rotationZ;
         public readonly ShowcaseBlockSettings Settings = new ShowcaseBlockSettings();
         public readonly Guid SETTINGS_GUID = new Guid("63afc52f-2324-473e-b680-a410dc079af0");
 
@@ -95,6 +96,7 @@ namespace ShowcaseBlock
                 // set default settings
                 rotationX.Value = (ushort)180;
                 rotationY.Value = (ushort)180;
+                rotationZ.Value = (ushort)180;
                 
                 // ?
                 if(!LoadSettings())
@@ -242,7 +244,7 @@ namespace ShowcaseBlock
 
                 displayPosition = model.PositionComp.LocalMatrixRef;
 
-                displayPosition = Matrix.Transform(displayPosition, Quaternion.CreateFromYawPitchRoll(MathHelper.ToRadians(rotationY), MathHelper.ToRadians(rotationX + 180), 0));
+                displayPosition = Matrix.Transform(displayPosition, Quaternion.CreateFromYawPitchRoll(MathHelper.ToRadians(rotationY), MathHelper.ToRadians(rotationX), MathHelper.ToRadians(rotationZ)));
                 displayPosition.Translation = dummyPosition.Translation;
                 displayPosition = Matrix.Normalize(displayPosition); // normalize to avoid any rotation inaccuracies over time resulting in weird scaling?
 
