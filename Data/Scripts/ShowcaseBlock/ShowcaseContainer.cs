@@ -41,7 +41,7 @@ namespace ShowcaseBlock
         public readonly Guid SETTINGS_GUID = new Guid("63afc52f-2324-473e-b680-a410dc079af0");
 
         private MatrixD dummyPosition;
-        private MatrixD displayPosition;
+        private Matrix displayPosition;
         // for multiple display slots
         //private MyEntity[] model;
         //private MatrixD[] displayPosition;
@@ -76,6 +76,7 @@ namespace ShowcaseBlock
                         dummyPosition = MatrixD.CreateScale(1f) *
                                         MatrixD.CreateFromQuaternion(Quaternion.CreateFromRotationMatrix(MatrixD.Normalize(dummy.Matrix))) *
                                         MatrixD.CreateTranslation(dummy.Matrix.Translation);
+                        displayPosition = dummyPosition;
                     }
                     catch { SimpleLog.Error(this, "dummy containing " + DUMMY_SUFFIX + " not found!: " + dummies.Values); }
                 }
@@ -134,7 +135,6 @@ namespace ShowcaseBlock
            if (inventory.ItemCount > 0)
            {
                first = inventory.GetItemAt(0).Value;
-               Rotate();
 
                // already displaying
                if (idDisplayed == first.ItemId)
@@ -179,6 +179,7 @@ namespace ShowcaseBlock
             if (isDisplaying)
             {
                 ShowItem();
+                Rotate();
             }
         }
 
@@ -220,7 +221,8 @@ namespace ShowcaseBlock
             entity.Name = entity.EntityId.ToString();
             entity.DisplayName = block.EntityId.ToString();
             
-            entity.PositionComp.LocalMatrix = displayPosition;
+            //entity.PositionComp.LocalMatrix = displayPosition;
+            entity.PositionComp.SetLocalMatrix(ref displayPosition);
             Sandbox.Game.Entities.MyEntities.SetEntityName(entity, true);
 
             entity.OnAddedToScene(block);
@@ -234,14 +236,17 @@ namespace ShowcaseBlock
         {
             if (model != null)
             {
+                // reset
                 displayPosition = dummyPosition;
-                displayPosition *= Matrix.CreateFromAxisAngle(dummyPosition.Down, MathHelper.ToRadians(rotationY));
-                // TODO rotate X around dummy center not bottom?
-                //displayPosition *= Matrix.CreateFromAxisAngle(dummyPosition.Right, MathHelper.ToRadians(rotationX + 180));
+                model.PositionComp.SetLocalMatrix(ref displayPosition, updateWorld: false);
 
-                // TODO deprecated
-                model.PositionComp.LocalMatrix = displayPosition;
-                model.Render.NeedsDraw = true;
+                displayPosition = model.PositionComp.LocalMatrixRef;
+
+                displayPosition = Matrix.Transform(displayPosition, Quaternion.CreateFromYawPitchRoll(MathHelper.ToRadians(rotationY), MathHelper.ToRadians(rotationX + 180), 0));
+                displayPosition.Translation = dummyPosition.Translation;
+                displayPosition = Matrix.Normalize(displayPosition); // normalize to avoid any rotation inaccuracies over time resulting in weird scaling?
+
+                model.PositionComp.SetLocalMatrix(ref displayPosition, source: block);
             }
         }
         private void DropInventory()
