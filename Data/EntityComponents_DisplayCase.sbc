@@ -6,7 +6,8 @@
         <TypeId>Inventory</TypeId>
         <SubtypeId>DisplayCase1</SubtypeId>
       </Id>
-	    <Volume>1</Volume>
+	<Volume>1</Volume>
+        <MaxItemCount>1</MaxItemCount>
         <Size x="1" y="1" z="1" />
         <InputConstraint Whitelist="true" Description="DisplayName_InventoryConstraint_PersonalItems" Icon="Textures\GUI\Icons\FilterComponent.dds">
             <Entry Type="PhysicalGunObject" />
@@ -18,6 +19,15 @@
 			<Entry Type="Package" />
 			<Entry Type="PhysicalObject" />
       </InputConstraint>
+    </EntityComponent>
+    <EntityComponent xsi:type="MyObjectBuilder_ModStorageComponentDefinition">
+      <Id>
+        <TypeId>ModStorageComponent</TypeId>
+        <SubtypeId>DisplayCase1</SubtypeId>
+      </Id>
+      <RegisteredStorageGuids>
+        <guid>63afc52f-2324-473e-b680-a410dc079af0</guid>
+      </RegisteredStorageGuids>
     </EntityComponent>
   </EntityComponents>
 </Definitions>

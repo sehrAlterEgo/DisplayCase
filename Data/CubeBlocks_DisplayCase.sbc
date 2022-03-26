@@ -48,7 +48,7 @@
             <DamagedSound>ParticleElectrical</DamagedSound>
             <PCU>25</PCU>
             <Capacity>80</Capacity>
-            <InventoryMaxVolume>1</InventoryMaxVolume>
+            <InventoryMaxVolume>0.1</InventoryMaxVolume>
             <InventorySize>
                 <X>1</X>
                 <Y>1</Y>

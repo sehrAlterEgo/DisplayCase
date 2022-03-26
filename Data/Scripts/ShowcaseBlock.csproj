@@ -130,8 +130,11 @@
     <None Include="ShowcaseBlock.ruleset" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ShowcaseBlock\Session.cs" />
+    <Compile Include="ShowcaseBlock\ShowcaseBlockSettings.cs" />
     <Compile Include="ShowcaseBlock\SimpleLog.cs" />
     <Compile Include="ShowcaseBlock\ShowcaseContainer.cs" />
+    <Compile Include="ShowcaseBlock\TerminalControls.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
