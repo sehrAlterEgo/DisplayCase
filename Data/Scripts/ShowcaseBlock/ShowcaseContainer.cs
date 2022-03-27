@@ -97,6 +97,9 @@ namespace ShowcaseBlock
                 rotationX.Value = (ushort)180;
                 rotationY.Value = (ushort)180;
                 rotationZ.Value = (ushort)180;
+                rotationX.ValueChanged += (_) => Rotate();
+                rotationY.ValueChanged += (_) => Rotate();
+                rotationZ.ValueChanged += (_) => Rotate();
                 
                 // ?
                 if(!LoadSettings())
@@ -123,6 +126,7 @@ namespace ShowcaseBlock
 
             NeedsUpdate |= MyEntityUpdateEnum.EACH_10TH_FRAME;
         }
+
         public override void UpdateAfterSimulation10()
         {
            if (MyAPIGateway.Session == null) // for startup or ds?
@@ -144,9 +148,7 @@ namespace ShowcaseBlock
 
                // replace
                if (isDisplaying)
-               {
                    HideItem();
-               }
 
                bool result = MyDefinitionId.TryParse(first.Type.TypeId,
                                                  first.Type.SubtypeId,
@@ -181,7 +183,6 @@ namespace ShowcaseBlock
             if (isDisplaying)
             {
                 ShowItem();
-                Rotate();
             }
         }
 
@@ -194,12 +195,9 @@ namespace ShowcaseBlock
             if (block == null)
                 return;
 
-            //model[id].OnRemovedFromScene(block);
-            //model[id] = null;
-            model.OnRemovedFromScene(block);
-            // TODO howto parent with?
-            //Sandbox.Game.Entities.MyEntities.Remove(model);
+            Sandbox.Game.Entities.MyEntities.Remove(model);
 
+            //model[id] = null;
             model = null;
             idDisplayed = -1;
             isDisplaying = false;
@@ -223,13 +221,10 @@ namespace ShowcaseBlock
             entity.Name = entity.EntityId.ToString();
             entity.DisplayName = block.EntityId.ToString();
             
-            //entity.PositionComp.LocalMatrix = displayPosition;
             entity.PositionComp.SetLocalMatrix(ref displayPosition);
             Sandbox.Game.Entities.MyEntities.SetEntityName(entity, true);
 
-            entity.OnAddedToScene(block);
-            // TODO howto parent with?
-            // Sandbox.Game.Entities.MyEntities.Add(entity);
+            Sandbox.Game.Entities.MyEntities.Add(entity);
 
             //models[id] = entity;
             model = entity;
@@ -270,7 +265,6 @@ namespace ShowcaseBlock
             }
             itemList.Clear();
         }
-
         public override void MarkForClose()
         {
             base.MarkForClose();
