@@ -10,5 +10,14 @@
         <Component BuilderType="MyObjectBuilder_Inventory"/>
       </DefaultComponents>
     </Container>
+    <Container>
+      <Id>
+        <TypeId>InteriorLight</TypeId>
+        <SubtypeId>DisplayCase2</SubtypeId>
+      </Id>
+      <DefaultComponents>
+        <Component BuilderType="MyObjectBuilder_Inventory"/>
+      </DefaultComponents>
+    </Container>
   </EntityContainers>
 </Definitions>

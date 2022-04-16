@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <BlockVariantGroups>
+
+        <BlockVariantGroup>
+            <Id Type="MyObjectBuilder_BlockVariantGroup" Subtype="DisplayCases" />
+             <Icon>Textures\GUI\Icons\Cubes\DisplayCase1.dds</Icon>
+            <DisplayName>Display Cases</DisplayName>
+            <Description>Sealed containers which can be used to display a prized item.</Description>
+            <Blocks>
+                <Block Type="MyObjectBuilder_InteriorLight" Subtype="DisplayCase1" />
+                <Block Type="MyObjectBuilder_InteriorLight" Subtype="DisplayCase2" />   
+            </Blocks>
+        </BlockVariantGroup>
+
+    </BlockVariantGroups>
+</Definitions>

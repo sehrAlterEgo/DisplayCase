@@ -9,108 +9,6 @@ namespace ShowcaseBlock
 {
     partial class ShowcaseContainer
     {
-        #region terminal controls
-        private void CreateTerminalControls()
-        {
-            var mod = ShowcaseBlockMod.Instance;
-
-            if(mod.ControlsCreated)
-                return;
-
-            mod.ControlsCreated = true;
-
-            IMyTerminalControlSlider tmp_control = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyLightingBlock>("rotationX");
-            tmp_control.Title = MyStringId.GetOrCompute("Pitch");
-            tmp_control.Enabled = Control_Visible;
-            tmp_control.Visible = Control_Visible; // (_) => false;
-            tmp_control.SetLimits(-180, 180);
-            tmp_control.Getter = rotationXGetter;
-            tmp_control.Setter = rotationXSetter;
-            tmp_control.Writer = rotationXWriter;
-            tmp_control.SupportsMultipleBlocks = true;
-
-            MyAPIGateway.TerminalControls.AddControl<IMyLightingBlock>(tmp_control);
-            tmp_control = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyLightingBlock>("rotationY");
-            tmp_control.Title = MyStringId.GetOrCompute("Yaw");
-            tmp_control.Enabled = Control_Visible;
-            tmp_control.Visible = Control_Visible;
-            tmp_control.SetLimits(-180, 180);
-            tmp_control.Getter = rotationYGetter;
-            tmp_control.Setter = rotationYSetter;
-            tmp_control.Writer = rotationYWriter;
-            tmp_control.SupportsMultipleBlocks = true;
-            MyAPIGateway.TerminalControls.AddControl<IMyLightingBlock>(tmp_control);
-
-            tmp_control = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSlider, IMyLightingBlock>("rotationZ");
-            tmp_control.Title = MyStringId.GetOrCompute("Roll");
-            tmp_control.Enabled = Control_Visible;
-            tmp_control.Visible = Control_Visible;
-            tmp_control.SetLimits(-180, 180);
-            tmp_control.Getter = rotationZGetter;
-            tmp_control.Setter = rotationZSetter;
-            tmp_control.Writer = rotationZWriter;
-            tmp_control.SupportsMultipleBlocks = true;
-            MyAPIGateway.TerminalControls.AddControl<IMyLightingBlock>(tmp_control);
-        }
-        static ShowcaseContainer GetLogic(IMyTerminalBlock block) => block?.GameLogic?.GetAs<ShowcaseContainer>();
-        static bool Control_Visible(IMyTerminalBlock block)
-        { return GetLogic(block) != null; }
-        private static float rotationXGetter(IMyTerminalBlock block) 
-        {
-             var logic = GetLogic(block);
-            return (logic == null ? 0 : logic.rotationX - 180); 
-        }
-        private static void rotationXSetter(IMyTerminalBlock block, float value)
-        { 
-            var logic = GetLogic(block);
-            if(logic != null)
-                logic.rotationX.Value = (ushort)(value + 180);
-                logic.Rotate();
-        }
-        private static void rotationXWriter(IMyTerminalBlock block, StringBuilder writer)
-        { 
-            var logic = GetLogic(block);
-            if(logic != null)
-                writer.Append((int)(logic.rotationX - 180));
-        }
-        private static float rotationYGetter(IMyTerminalBlock block) 
-        { 
-            var logic = GetLogic(block);
-            return (logic == null ? 0 : logic.rotationY - 180); 
-        }
-        private static void rotationYSetter(IMyTerminalBlock block, float value)
-        { 
-            var logic = GetLogic(block);
-            if(logic != null)
-                logic.rotationY.Value = (ushort)(value + 180);
-                logic.Rotate();
-        }
-        private static void rotationYWriter(IMyTerminalBlock block, StringBuilder writer)
-        { 
-            var logic = GetLogic(block);
-            if(logic != null)
-                writer.Append(logic.rotationY - 180);
-        }
-        private static float rotationZGetter(IMyTerminalBlock block) 
-        { 
-            var logic = GetLogic(block);
-            return (logic == null ? 0 : logic.rotationZ - 180); 
-        }
-        private static void rotationZSetter(IMyTerminalBlock block, float value)
-        { 
-            var logic = GetLogic(block);
-            if(logic != null)
-                logic.rotationZ.Value = (ushort)(value + 180);
-                logic.Rotate();
-        }
-        private static void rotationZWriter(IMyTerminalBlock block, StringBuilder writer)
-        { 
-            var logic = GetLogic(block);
-            if(logic != null)
-                writer.Append(logic.rotationZ - 180);
-        }
-        #endregion
-
         #region Settings
         // https://github.com/THDigi/GravityCollector
         bool LoadSettings()
@@ -203,10 +101,10 @@ namespace ShowcaseBlock
                 return; // called too soon or after it was already closed, ignore
 
             if(Settings == null)
-                throw new NullReferenceException($"Settings == null on entId={Entity?.EntityId}; modInstance={ShowcaseBlockMod.Instance != null}");
+                throw new NullReferenceException($"Settings == null on entId={Entity?.EntityId};");
 
             if(MyAPIGateway.Utilities == null)
-                throw new NullReferenceException($"MyAPIGateway.Utilities == null; entId={Entity?.EntityId}; modInstance={ShowcaseBlockMod.Instance != null}");
+                throw new NullReferenceException($"MyAPIGateway.Utilities == null; entId={Entity?.EntityId};");
 
             if(block.Storage == null)
                 block.Storage = new Sandbox.Game.EntityComponents.MyModStorageComponent();

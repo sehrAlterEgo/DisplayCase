@@ -20,13 +20,14 @@ using VRage.Network;
 
 namespace ShowcaseBlock
 {
-    [MyEntityComponentDescriptor(typeof(Sandbox.Common.ObjectBuilders.MyObjectBuilder_InteriorLight), true, new string[] { "DisplayCase1" })]
+    [MyEntityComponentDescriptor(typeof(Sandbox.Common.ObjectBuilders.MyObjectBuilder_InteriorLight), true, new string[] { "DisplayCase1", "DisplayCase2" })]
     partial class ShowcaseContainer : MyGameLogicComponent, IMyEventProxy
     {
         // using MySync
         // https://discord.com/channels/125011928711036928/126460115204308993/938979913162170478
 
         private bool init = true;
+
         private const string DUMMY_SUFFIX = "detector_trophycase_";
 
         IMyLightingBlock block;
@@ -35,9 +36,9 @@ namespace ShowcaseBlock
         private List<VRage.Game.ModAPI.Ingame.MyInventoryItem> itemList = new List<VRage.Game.ModAPI.Ingame.MyInventoryItem>();
         private VRage.Game.ModAPI.Ingame.MyInventoryItem first;
 
-        MySync<UInt16, VRage.Sync.SyncDirection.BothWays> rotationX;
-        MySync<UInt16, VRage.Sync.SyncDirection.BothWays> rotationY;
-        MySync<UInt16, VRage.Sync.SyncDirection.BothWays> rotationZ;
+        public MySync<UInt16, VRage.Sync.SyncDirection.BothWays> rotationX;
+        public MySync<UInt16, VRage.Sync.SyncDirection.BothWays> rotationY;
+        public MySync<UInt16, VRage.Sync.SyncDirection.BothWays> rotationZ;
         public readonly ShowcaseBlockSettings Settings = new ShowcaseBlockSettings();
         public readonly Guid SETTINGS_GUID = new Guid("63afc52f-2324-473e-b680-a410dc079af0");
 
@@ -60,8 +61,6 @@ namespace ShowcaseBlock
             block = (IMyLightingBlock)Entity;
             block.NeedsWorldMatrix = true;
             NeedsUpdate |= MyEntityUpdateEnum.BEFORE_NEXT_FRAME;
-
-            CreateTerminalControls();
         }
         private void GetDummies()
         {
@@ -183,6 +182,7 @@ namespace ShowcaseBlock
             if (isDisplaying)
             {
                 ShowItem();
+		Rotate();
             }
         }
 
@@ -205,29 +205,31 @@ namespace ShowcaseBlock
         private void ShowItem()
         {
             MyEntity entity = new MyEntity();
+            try
+            {
+                MyPhysicalItemDefinition itemDef = MyDefinitionManager.Static.GetPhysicalItemDefinition(defDisplayed); 
+                
+                entity.Init(null, itemDef.Model, (MyEntity)block, null, null);
+                entity.Save = false;
+                entity.SyncFlag = false;
+                entity.IsPreview = true;
+                entity.NeedsWorldMatrix = true;
 
-            MyPhysicalItemDefinition itemDef = MyDefinitionManager.Static.GetPhysicalItemDefinition(defDisplayed);
-            
-            entity.Init(null, itemDef.Model, (MyEntity)block, null, null);
-            entity.Save = false;
-            entity.SyncFlag = false;
-            entity.IsPreview = true;
-            entity.NeedsWorldMatrix = true;
+                entity.Render.EnableColorMaskHsv = true;
+                entity.Render.ColorMaskHsv = block.Render.ColorMaskHsv;
+                entity.Render.PersistentFlags = MyPersistentEntityFlags2.CastShadows;
+                entity.Flags = EntityFlags.UpdateRender | EntityFlags.NeedsWorldMatrix | EntityFlags.Visible | EntityFlags.NeedsDraw | EntityFlags.NeedsDrawFromParent | EntityFlags.InvalidateOnMove;
+                entity.Name = entity.EntityId.ToString();
+                entity.DisplayName = block.EntityId.ToString();
+                entity.PositionComp.SetLocalMatrix(ref displayPosition);
+                Sandbox.Game.Entities.MyEntities.SetEntityName(entity, true);
 
-            entity.Render.EnableColorMaskHsv = true;
-            entity.Render.ColorMaskHsv = block.Render.ColorMaskHsv;
-            entity.Render.PersistentFlags = MyPersistentEntityFlags2.CastShadows;
-            entity.Flags = EntityFlags.UpdateRender | EntityFlags.NeedsWorldMatrix | EntityFlags.Visible | EntityFlags.NeedsDraw | EntityFlags.NeedsDrawFromParent | EntityFlags.InvalidateOnMove;
-            entity.Name = entity.EntityId.ToString();
-            entity.DisplayName = block.EntityId.ToString();
-            
-            entity.PositionComp.SetLocalMatrix(ref displayPosition);
-            Sandbox.Game.Entities.MyEntities.SetEntityName(entity, true);
+                Sandbox.Game.Entities.MyEntities.Add(entity, true);
 
-            Sandbox.Game.Entities.MyEntities.Add(entity);
-
-            //models[id] = entity;
-            model = entity;
+                model = entity;
+                //models[id] = entity;
+            }
+            catch (Exception e) { SimpleLog.Error(this, e); }
         }
         private void Rotate()
         {
@@ -248,29 +250,26 @@ namespace ShowcaseBlock
         }
         private void DropInventory()
         {
-            if (inventory.Empty()) { return; }
+            if (!MyAPIGateway.Multiplayer.IsServer)
+                return;
+
+            if (inventory.Empty()) 
+                return;
 
             inventory.GetItems(itemList);
             foreach (VRage.Game.ModAPI.Ingame.MyInventoryItem item in itemList)
             {
-                MyDefinitionId currentDef;
-                bool result = MyDefinitionId.TryParse(item.Type.TypeId,
-                                                  item.Type.SubtypeId,
-                                                  out currentDef);
-                // IMyInventoryItem variant
-                // MyDefinitionId currentDef = item.Content.GetId();
-
-                MyPhysicalItemDefinition itemDef = MyDefinitionManager.Static.GetPhysicalItemDefinition(currentDef);
-                MyVisualScriptLogicProvider.SpawnItem(itemDef.Id, block.WorldMatrix.Translation, amount: item.Amount.ToIntSafe());
+                inventory.RemoveItems(item.ItemId, amount: item.Amount, spawn: true);
             }
             itemList.Clear();
+
+            HideItem();
         }
         public override void MarkForClose()
         {
             base.MarkForClose();
             // called when entity is about to be removed for whatever reason (block destroyed, entity deleted, ship despawn because of sync range, etc)
             NeedsUpdate |= MyEntityUpdateEnum.NONE;
-            HideItem();
             DropInventory();
         }
 
