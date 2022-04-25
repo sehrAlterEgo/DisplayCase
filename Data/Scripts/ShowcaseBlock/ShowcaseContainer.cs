@@ -21,7 +21,7 @@ using VRage.Network;
 namespace ShowcaseBlock
 {
     [MyEntityComponentDescriptor(typeof(Sandbox.Common.ObjectBuilders.MyObjectBuilder_InteriorLight), true, new string[] { "DisplayCase1", "DisplayCase2" })]
-    partial class ShowcaseContainer : MyGameLogicComponent, IMyEventProxy
+    public partial class ShowcaseContainer : MyGameLogicComponent, IMyEventProxy
     {
         // using MySync
         // https://discord.com/channels/125011928711036928/126460115204308993/938979913162170478
@@ -40,7 +40,7 @@ namespace ShowcaseBlock
         public MySync<UInt16, VRage.Sync.SyncDirection.BothWays> rotationY;
         public MySync<UInt16, VRage.Sync.SyncDirection.BothWays> rotationZ;
         public readonly ShowcaseBlockSettings Settings = new ShowcaseBlockSettings();
-        public readonly Guid SETTINGS_GUID = new Guid("63afc52f-2324-473e-b680-a410dc079af0");
+        public Guid SETTINGS_GUID { get; private set; }
 
         private MatrixD dummyPosition;
         private Matrix displayPosition;
@@ -55,6 +55,19 @@ namespace ShowcaseBlock
 
         bool IsDedicatedServer { get { return MyAPIGateway.Multiplayer.IsServer && MyAPIGateway.Utilities.IsDedicated; } }
 
+        private static Guid GetGUID(IMyLightingBlock block)
+        {
+            Guid defaultGuid = new Guid("63afc52f-2324-473e-b680-a410dc079af0");
+            string subTypeName = block?.GetObjectBuilder()?.SubtypeName;
+            if (subTypeName == null) { return defaultGuid; }
+            switch (subTypeName)
+            {
+                case "DisplayCase2":
+                    return new Guid("2e3ce819-6b2d-426c-996c-20df4d44ce77");
+                default:
+                    return defaultGuid;
+            }
+        }
         public override void Init(MyObjectBuilder_EntityBase objectBuilder)
         {
             base.Init(objectBuilder);
@@ -100,7 +113,7 @@ namespace ShowcaseBlock
                 rotationY.ValueChanged += (_) => Rotate();
                 rotationZ.ValueChanged += (_) => Rotate();
                 
-                // ?
+                SETTINGS_GUID = GetGUID(block);
                 if(!LoadSettings())
                 {
                     ParseLegacyNameStorage();
@@ -108,6 +121,8 @@ namespace ShowcaseBlock
 
                 SaveSettings(); // required for IsSerialized()
                 init = false;
+
+                MyAPIGateway.Session.DamageSystem.RegisterDestroyHandler(1, DestroyHandler);
             }
 
             try 
@@ -126,10 +141,27 @@ namespace ShowcaseBlock
             NeedsUpdate |= MyEntityUpdateEnum.EACH_10TH_FRAME;
         }
 
+        private void DestroyHandler(object target, MyDamageInformation damageInformation)
+        {
+            IMySlimBlock slimBlock = target as IMySlimBlock;
+            if (slimBlock == null) return;
+
+            IMyTerminalBlock terminalTarget = slimBlock.FatBlock as IMyTerminalBlock;
+            if (terminalTarget == null) return;
+
+            ShowcaseContainer container = ShowcaseBlockMod.GetLogic(terminalTarget);
+            if (container != null)
+            {
+                container.DropInventory();
+                SimpleLog.Info(this, "damageInformation.Amount");
+            }
+            return;
+        }
+
         public override void UpdateAfterSimulation10()
         {
            if (MyAPIGateway.Session == null) // for startup or ds?
-           { return; }
+             return;
 
            if (!block.IsFunctional || !block.IsWorking)
            {
@@ -182,7 +214,7 @@ namespace ShowcaseBlock
             if (isDisplaying)
             {
                 ShowItem();
-		Rotate();
+		        Rotate();
             }
         }
 
@@ -253,7 +285,7 @@ namespace ShowcaseBlock
             if (!MyAPIGateway.Multiplayer.IsServer)
                 return;
 
-            if (inventory.Empty()) 
+            if (inventory == null || inventory.Empty()) 
                 return;
 
             inventory.GetItems(itemList);
@@ -261,17 +293,20 @@ namespace ShowcaseBlock
             {
                 inventory.RemoveItems(item.ItemId, amount: item.Amount, spawn: true);
             }
-            itemList.Clear();
+            if (itemList != null)
+                itemList.Clear();
 
             HideItem();
         }
-        public override void MarkForClose()
-        {
-            base.MarkForClose();
-            // called when entity is about to be removed for whatever reason (block destroyed, entity deleted, ship despawn because of sync range, etc)
-            NeedsUpdate |= MyEntityUpdateEnum.NONE;
-            DropInventory();
-        }
+        //public override void MarkForClose()
+        //{
+        //    base.MarkForClose();
+        //    // called when entity is about to be removed for whatever reason (block destroyed, entity deleted, ship despawn because of sync range, etc)
+        //    // also called during unload?
+        //    //NeedsUpdate |= MyEntityUpdateEnum.NONE;
+        //    //if (!MyParticlesManager.Paused)
+        //    //    DropInventory();
+        //}
 
     }
 }
