@@ -6,7 +6,7 @@
             <Id Type="MyObjectBuilder_BlockVariantGroup" Subtype="DisplayCases" />
              <Icon>Textures\GUI\Icons\Cubes\DisplayCase1.dds</Icon>
             <DisplayName>Display Cases</DisplayName>
-            <Description>Sealed containers which can be used to display a prized item.</Description>
+            <Description>A sealed container which can be used to display a prized item.</Description>
             <Blocks>
                 <Block Type="MyObjectBuilder_InteriorLight" Subtype="DisplayCase1" />
                 <Block Type="MyObjectBuilder_InteriorLight" Subtype="DisplayCase2" />   

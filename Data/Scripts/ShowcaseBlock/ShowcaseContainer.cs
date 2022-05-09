@@ -55,6 +55,7 @@ namespace ShowcaseBlock
 
         bool IsDedicatedServer { get { return MyAPIGateway.Multiplayer.IsServer && MyAPIGateway.Utilities.IsDedicated; } }
 
+	// TODO
         private static Guid GetGUID(IMyLightingBlock block)
         {
             Guid defaultGuid = new Guid("63afc52f-2324-473e-b680-a410dc079af0");
@@ -153,7 +154,6 @@ namespace ShowcaseBlock
             if (container != null)
             {
                 container.DropInventory();
-                SimpleLog.Info(this, "damageInformation.Amount");
             }
             return;
         }
@@ -298,15 +298,5 @@ namespace ShowcaseBlock
 
             HideItem();
         }
-        //public override void MarkForClose()
-        //{
-        //    base.MarkForClose();
-        //    // called when entity is about to be removed for whatever reason (block destroyed, entity deleted, ship despawn because of sync range, etc)
-        //    // also called during unload?
-        //    //NeedsUpdate |= MyEntityUpdateEnum.NONE;
-        //    //if (!MyParticlesManager.Paused)
-        //    //    DropInventory();
-        //}
-
     }
 }

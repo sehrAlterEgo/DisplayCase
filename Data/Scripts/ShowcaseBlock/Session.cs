@@ -12,19 +12,15 @@ namespace ShowcaseBlock
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate)]
     public class ShowcaseBlockMod : MySessionComponentBase
     {
-        //public static ShowcaseBlockMod Instance;
-        //public bool ControlsCreated = false;
 
         public override void LoadData()
         {
-            //Instance = this;
             MyAPIGateway.TerminalControls.CustomControlGetter += CreateTerminalControls;
             MyAPIGateway.TerminalControls.CustomActionGetter += CreateTerminalActions;
         }
 
         protected override void UnloadData()
         {
-            //Instance = null;
             MyAPIGateway.TerminalControls.CustomControlGetter -= CreateTerminalControls;
             MyAPIGateway.TerminalControls.CustomActionGetter -= CreateTerminalActions;
         }
@@ -43,15 +39,6 @@ namespace ShowcaseBlock
             {
                 string modPath = ModContext.ModPath;
                 return Path.Combine(modPath, relativePath);
-                //foreach(VRage.Game.MyObjectBuilder_Checkpoint.ModItem mod in MyAPIGateway.Session.Mods)
-                //{
-                //    //if(mod.GetWorkshopId().Id == 2795591150)
-                //    if(mod.Name == "DisplayCases")
-                //    {
-                //        modPath = mod.GetPath();
-                //        return Path.Combine(modPath, relativePath);
-                //    }
-                //}
             }
             return Path.Combine(MyAPIGateway.Utilities.GamePaths.ContentPath, relativePath);
         }
@@ -61,10 +48,6 @@ namespace ShowcaseBlock
             {
                 return;
             }
-
-            //List<IMyTerminalControlProperty> resultList = new List<ITerminalProperty>();
-            //MyTerminalControlFactoryHelper.Static.GetProperties(typeof(IMyLightingBlock), resultList);
-            //IMyTerminalControlProperty<int> Pitch = ;
 
             IMyTerminalAction incPitch = MyAPIGateway.TerminalControls.CreateAction<IMyLightingBlock>("increasePitch");
             incPitch.Name = new StringBuilder("increase Pitch");

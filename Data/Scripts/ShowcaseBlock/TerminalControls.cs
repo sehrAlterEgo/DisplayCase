@@ -113,7 +113,6 @@ namespace ShowcaseBlock
             Settings.rotationY = rotationY;
             Settings.rotationZ = rotationZ;
             block.Storage.SetValue(SETTINGS_GUID, Convert.ToBase64String(MyAPIGateway.Utilities.SerializeToBinary(Settings)));
-            //block.Storage.Values.Add(Convert.ToBase64String(MyAPIGateway.Utilities.SerializeToBinary(Settings)));
         }
         public override bool IsSerialized()
         {
